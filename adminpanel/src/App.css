@@ -1,0 +1,20 @@
+/* NPT Style Colors */
+.nav-link.npt-active {
+  background-color: #1a335d !important; /* Dark Navy Blue */
+  color: white !important;
+  border-radius: 8px !important;
+}
+
+.nav-link.npt-hover:hover {
+  background-color: #f1f4f9;
+  color: #1a335d !important;
+  border-radius: 8px;
+}
+
+.nav-link:not(.npt-active) i {
+  color: #6c757d;
+}
+
+.transition-all {
+  transition: all 0.2s ease-in-out;
+}

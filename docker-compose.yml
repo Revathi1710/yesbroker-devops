@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: "mongo"
+    container_name: yesbroker-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: './backend'
+    container_name: yesbroker-backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    env_file:
+      - "./backend/.env.prod"
+
+  frontend:
+    build: './frontend'
+    container_name: yesbroker-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    env_file:
+      - "./frontend/.env.prod"
+
+volumes:
+  mongo-data:

@@ -1,0 +1,46 @@
+name: Yesbroker devops CI
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  mongo-init-and-test:
+    runs-on: ubuntu-latest
+
+    env:
+      PORT: ${{ secrets.PORT }}
+      MONGO_URI: mongodb://localhost:27017/testdb
+
+    services:
+      mongo:
+        image: mongo
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Waiting for MongoDB to be ready
+        run: |
+          until nc -z localhost 27017; do
+            echo "Waiting for MongoDB..."
+            sleep 2
+          done
+          echo "MongoDB is up"
+
+      - name: Install dependencies and Seed MongoDB
+        working-directory: ./backend
+        run: |
+          npm install
+          node seedTasksData.js
+
+      - name: Running backend test
+        working-directory: ./backend
+        run: npm run test
