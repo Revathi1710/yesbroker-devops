@@ -1,5 +1,4 @@
-FROM node:18-alpine
-
+FROM node:22
 WORKDIR /app
 
 # Copy package.json from the parent directory context
