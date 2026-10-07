@@ -5,12 +5,17 @@ on:
     branches: [main]
 
 jobs:
-  mongo-init-and-test:
+  test:
     runs-on: ubuntu-latest
 
     env:
-      PORT: ${{ secrets.PORT }}
-      MONGO_URI: mongodb://localhost:27017/testdb
+      PORT: 5000
+      MONGO_URL: mongodb://localhost:27017/testdb   # code reads MONGO_URL, not MONGO_URI
+      JWT_SECRET: ci-test-secret
+      # Only if a test really needs them, add as Repository secrets:
+      # CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+      # CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+      # CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
 
     services:
       mongo:
@@ -25,7 +30,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "22"            # mongoose 9 / mongodb 7 need Node 20.19+
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
 
       - name: Waiting for MongoDB to be ready
         run: |
@@ -35,12 +42,10 @@ jobs:
           done
           echo "MongoDB is up"
 
-      - name: Install dependencies and Seed MongoDB
+      - name: Install backend dependencies
         working-directory: ./backend
-        run: |
-          npm install
-          node seedTasksData.js
+        run: npm ci
 
       - name: Running backend test
         working-directory: ./backend
-        run: npm run test
+        run: npm test

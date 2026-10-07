@@ -2,7 +2,9 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+# Copy package.json from the parent directory context
+COPY ../package*.json ./
+
 RUN npm install
 
 COPY . .
