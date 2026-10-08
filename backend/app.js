@@ -14,16 +14,15 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({
-    origin: [
-        "http://localhost:5173",
-        "http://localhost:5174",
-        'http://localhost:3000',
-        "https://yesbroker2.onrender.com",
-        "https://yesbrokerfinal.onrender.com"
-    ],
-    credentials: true
-}));
+const allowedOrigins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://yesbroker2.onrender.com",
+    "https://yesbrokerfinal.onrender.com",
+    ...(process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(",") : [])
+];
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 app.use(express.json());
 app.use(cookieParser());
